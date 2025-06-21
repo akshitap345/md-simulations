@@ -1,1 +1,1 @@
-# MD Simulations
+# md-simulations
