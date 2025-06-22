@@ -1,0 +1,15 @@
+# Ignore Pyhton artifacts
+_pycache_/
+*.pyc
+*.pyo
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# VSCode and logs
+.vscode/
+*.log
