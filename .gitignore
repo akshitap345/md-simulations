@@ -1,3 +1,13 @@
+# LAAMPS outputs
+*.log
+*.dump
+*.dat
+*.xyz
+#visualization files
+*.ovito
+*.vmd
+*.mp4
+*.avi
 # Ignore Pyhton artifacts
 _pycache_/
 *.pyc
@@ -8,6 +18,7 @@ _pycache_/
 
 # System Files
 .DS_Store
+*.swp
 Thumbs.db
 
 # VSCode and logs
