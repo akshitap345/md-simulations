@@ -1,4 +1,11 @@
-# Molecular Dynamics Simulations
+## 📁 Data & Visualization
+
+- ✅ Input scripts, log files, and potential files are organized in folders like `crack/`, `friction/`, and `common/`.
+- ✅ This includes LAMMPS input files (`.lmp`), log files (`log.lammps`), and EAM potential files used for MD simulations.
+- ✅ Python notebooks (if any) are located in the `notebooks/` folder for post-processing and analysis.
+- 🧪 Large output files such as `.ovito`, `.vmd`, and `.xyz` used for OVITO/VMD visualization are **not included** in the GitHub repo due to size limits.
+- 🔗 These files are available upon request or accessible via [Google Drive](#) or [OneDrive](#).
+Molecular Dynamics Simulations
 This respository contains ongoing molecular dynamics (MD) simulations of materials (HCC,FCC,BCC) using LAAMPS. The goal is to study deformation and failure mechanisms under various loading and thermal conditions.
 ## Folder Structure
 - `crack/` -  Input scripts amd results for fracture simulations
