@@ -1,0 +1,72 @@
+# 3d aluminum shear simulation
+
+# ------------------------ INITIALIZATION ----------------------------
+units       metal
+dimension   3
+boundary    s s p
+atom_style  atomic
+
+# ----------------------- ATOM DEFINITION ----------------------------
+lattice     fcc 4.05
+region      box block 0 10.0 0 10.0 0 10.0
+create_box  1 box
+lattice     fcc 4.05 orient x 1 0 0 orient y 0 1 1 orient z 0 -1 1 origin 0.5 0 0
+create_atoms 1 box
+
+pair_style  eam/alloy
+pair_coeff  * * "C:/Users/apand/Desktop/LAMMPS 64-bit 2Apr2025/Examples/3d/Al99.eam.alloy" Al
+
+neighbor    0.3 bin
+neigh_modify delay 5
+
+region      lower block INF INF INF 0.9 INF INF
+region      upper block INF INF 6.1 INF INF INF
+group       lower region lower
+group       upper region upper
+group       boundary union lower upper
+group       mobile subtract all boundary
+
+set         group lower type 1
+set         group upper type 1
+
+# ----------------------- TEMPERATURE CONTROLS -----------------------
+compute     new3d mobile temp
+compute     new2d mobile temp/partial 0 1 1
+compute     csym all centro/atom fcc
+compute     peratom all pe/atom 
+compute     virial all stress/atom NULL 
+
+velocity    mobile create 300.0 5812775 temp new3d
+fix         1 all nve
+fix         2 boundary setforce 0.0 0.0 0.0
+fix         3 mobile temp/rescale 10 300.0 300.0 10.0 1.0
+fix_modify  3 temp new3d
+
+thermo      25
+thermo_modify temp new3d
+
+timestep    0.001
+run         100
+
+# ----------------------------- SHEAR --------------------------------
+velocity    upper set 1.0 0 0
+velocity    mobile ramp vx 0.0 1.0 y 1.4 8.6 sum yes
+
+unfix       3
+fix         3 mobile temp/rescale 10 300.0 300.0 10.0 1.0
+fix_modify  3 temp new2d
+
+# (Re-defining compute csym/peratom/virial again is redundant)
+# So remove the second definitions:
+# compute     csym all centro/atom fcc
+# compute     peratom all pe/atom
+# compute     virial all stress/atom NULL
+
+dump        1 all custom 100 dump.Al.shear.* id type x y z c_csym c_peratom fx fy fz &
+            c_virial[1] c_virial[2] c_virial[3] c_virial[4] c_virial[5] c_virial[6]
+dump_modify 1 sort id
+thermo      100
+thermo_modify temp new2d
+
+reset_timestep 0
+run         20000
