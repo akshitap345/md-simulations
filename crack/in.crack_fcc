@@ -1,0 +1,55 @@
+# FCC Crack Simulation in LAMMPS
+
+# Initialization
+units           metal
+dimension       3
+boundary        p p p
+atom_style      atomic
+
+variable a equal 4.05    # lattice constant for Al
+# Lattice and region
+lattice         fcc 4.05 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region          box block 0 20 0 20 0 20
+create_box      1 box
+create_atoms    1 box
+
+# Mass and interatomic potential
+mass            1 26.98  # Aluminum
+pair_style      eam/alloy
+pair_coeff * * Al99.eam.alloy Al 
+# Define groups for crack and loading
+region          lower block INF INF INF 2.0 INF INF
+region          upper block INF INF 18.0 INF INF INF
+group           lower region lower
+group           upper region upper
+group           boundary union lower upper
+group           mobile subtract all boundary
+
+region          leftupper block INF 5 10 20 INF INF
+region          leftlower block INF 5 0 10 INF INF
+group           leftupper region leftupper
+group           leftlower region leftlower
+
+
+
+# Initial velocities
+compute         new mobile temp
+velocity        mobile create 0.01 887723 temp new
+velocity        upper set 0.0 30 0.0
+velocity        mobile ramp vy 0.0 30 y 2.0 18.0 sum yes
+
+# Fixes
+fix             1 all nve
+fix             2 boundary setforce NULL 0.0 0.0
+
+# Output and run
+thermo          200
+thermo_modify   temp new
+dump 1 all custom 100 dump.ovito.lammpstrj id type x y z
+dump_modify     1 sort id
+timestep        0.003
+dump dumpOvito all custom 100 dump.ovito id type x y z
+dump_modify dumpOvito sort id
+dump dumpVMD all xyz 100 dump.xyz
+dump_modify dumpVMD sort id
+run             50000
